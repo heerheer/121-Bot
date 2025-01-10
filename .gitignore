@@ -1,0 +1,5 @@
+.env
+.venv
+/test.ipynb
+/test.py
+main_1.py
