@@ -2,6 +2,7 @@ import time
 
 from wxauto import WeChat
 from commands import * # 导入所有命令
+
 global wx
 global target
 
@@ -17,6 +18,9 @@ registry.register(StatusCommand())
 registry.register(HelpCommand())
 registry.register(WeatherCommand())
 registry.register(ElectricityCheckSchedule())
+registry.register(DailyMoyuReportSchedule())
+registry.register(CrazyKFCSchedule())
+registry.register(DailyGoodMorningSchedule())
 
 wx.AddListenChat(who=target, savepic=False)
 wx.AddListenChat(who='bottest', savepic=False)

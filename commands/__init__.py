@@ -5,3 +5,4 @@ from .help_command import *
 from .weather_command import *
 from .status_command import *
 from .name_commands import *
+from .daily_schedules import *
