@@ -4,8 +4,7 @@ import requests
 
 from commands.base.command import ScheduleCommand
 
-global target
-global wx
+from bot_121 import wx,target
 
 class DailyMoyuReportSchedule(ScheduleCommand):
     def __init__(self):
