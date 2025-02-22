@@ -1,23 +1,46 @@
+import os
+import pickle
+import subprocess
 
 import requests
 from bs4 import BeautifulSoup
-import subprocess
+
 import utils
 
 
 class Authenticator:
-    def __init__(self,service,debug=False):
+    def __init__(self, service: str, debug=False):
         # 用于储存登入后的一些数据
         self.service = service
         self.login_data = {}
         self.session = requests.Session()
+        self.cookie_file = ".cookies_"+self.service.replace('http://',"").replace('/', '_')+".pkl"  # 根据service生成唯一的cookie文件名
         self.headers = {
-            "Host": "ids2.just.edu.cn", 
+            "Host": "ids2.just.edu.cn",
             "Connection": "keep-alive",
             "Content-Type": "application/x-www-form-urlencoded",
             "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
             "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:130.0) Gecko/20100101 Firefox/130.0",
-            }
+        }
+        self.ignore_cookies = ['Location']  # 要忽略的 cookie 名列表
+        self.load_cookies()  # 初始化时尝试加载cookie
+
+    def save_cookies(self):
+        """保存cookies到文件"""
+        filtered_cookies = {name: value for name, value in self.session.cookies.items() if
+                            name not in self.ignore_cookies}
+        with open(self.cookie_file, 'wb') as f:
+            pickle.dump(self.session.cookies, f)
+
+    def load_cookies(self):
+        """从文件加载cookies"""
+        """从文件加载cookies，忽略指定的 cookie 名"""
+        if os.path.exists(self.cookie_file):
+            with open(self.cookie_file, 'rb') as f:
+                cookies = pickle.load(f)
+                for name, value in cookies.items():
+                    if name not in self.ignore_cookies:
+                        self.session.cookies.set(name, value)
 
 
     def jsessionid(self):
@@ -26,6 +49,7 @@ class Authenticator:
         '''
         d = self.session.cookies
         return d["JSESSIONID"] if 'JSESSIONID' in d else None
+
     def encrypt_with_node(self, password):
         """
         使用 Node.js 脚本加密数据
@@ -66,7 +90,7 @@ class Authenticator:
             target = res.headers["Location"]
 
             # debug
-            print(res.status_code,'->',target)
+            print(res.status_code, '->', target)
             print(res.headers)
             print(session.cookies.get_dict())
 
@@ -81,7 +105,7 @@ class Authenticator:
             )
 
             # debug
-            print(res.status_code,'->',target)
+            print(res.status_code, '->', target)
             print(res.headers)
             print(session.cookies.get_dict())
 
@@ -104,13 +128,14 @@ class Authenticator:
             }
 
             # login
-            res = session.post(target,headers=self.headers,data=data,allow_redirects=False)
-            
+            res = session.post(target, headers=self.headers, data=data, allow_redirects=False)
+
             if res.status_code == 302:
                 print("Login Success")
+                self.save_cookies()
                 target = res.headers["Location"]
                 # debug
-                print(res.status_code,'->',target)
+                print(res.status_code, '->', target)
                 print(session.cookies.get_dict())
 
                 self.headers["Origin"] = utils.get_origin(target)
@@ -120,7 +145,7 @@ class Authenticator:
                 res = session.get(
                     target,
                     headers=self.headers,
-                    allow_redirects=False)       
+                    allow_redirects=False)
 
                 # debug
                 print(res.status_code)
@@ -128,7 +153,7 @@ class Authenticator:
                 # 如果有跳转则输出跳转地址
                 if res.status_code == 302:
                     target = res.headers["Location"]
-                    print('->',target)
+                    print('->', target)
 
 
 
@@ -138,13 +163,14 @@ class Authenticator:
 
         return 0
 
-
-    
     def expire(self):
         """
         强制清除Cookies信息过期
         """
         self.session.cookies.clear()
+        # 删除cookie文件
+        if os.path.exists(self.cookie_file):
+            os.remove(self.cookie_file)
 
     def check(self):
         """
