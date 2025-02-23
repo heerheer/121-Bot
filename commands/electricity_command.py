@@ -3,10 +3,10 @@ import os
 from dotenv import load_dotenv
 
 from auth import Authenticator
-from commands.base.command import ExactMatchCommand, ScheduleCommand
+from .base.command import ExactMatchCommand, ScheduleCommand
 from queryBill import query_electric_bill
 
-from bot_121 import wx,target
+from state import wx,target
 
 # 加载 .env 文件
 load_dotenv()

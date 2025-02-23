@@ -1,13 +1,11 @@
 import time
 
 from wxauto import WeChat
-from commands import * # 导入所有命令
+from commands import *  # 导入所有命令
 
-global wx
-global target
+from state import wx,target
 
-wx = WeChat()
-target = 'C12-121'
+
 
 # 初始化指令注册器
 registry = CommandRegistry()
