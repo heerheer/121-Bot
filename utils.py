@@ -38,7 +38,7 @@ def get_temp_now():
         return temperature
     return 999
 
-def get_weather():
+def get_weather()->str:
     """
     获取当前天气信息
     """
@@ -57,6 +57,24 @@ def get_weather():
         return f"天气：{weather_text}，最高温度：{temp_max}℃，最低温度：{temp_min}℃"
     return "无法获取天气信息"
 
+
+
+def get_three_days_weather()->str:
+    """获取未来三天的天气预报信息"""
+    FORECAST_API_URL = "https://devapi.qweather.com/v7/weather/3d"  # 3天预报API
+    params = {
+        "key": WEATHER_API_KEY,
+        "location": WEATHER_API_LOCATION
+    }
+    response = requests.get(FORECAST_API_URL, params=params)
+    if response.status_code == 200:
+        data = response.json()
+        forecast_text = ""
+        for i, day in enumerate(data["daily"]):
+            day_text = "今天" if i == 0 else "明天" if i == 1 else "后天"
+            forecast_text += f"{day_text}：{day['textDay']}，气温{day['tempMin']}℃~{day['tempMax']}℃\n"
+        return forecast_text.strip()
+    return "无法获取天气预报信息"
 
 def get_outfit_recommendation(weather,style="简约",loc="学校"):
     """

@@ -19,6 +19,7 @@ registry.register(ElectricityCheckSchedule())
 registry.register(DailyMoyuReportSchedule())
 registry.register(CrazyKFCSchedule())
 registry.register(DailyGoodMorningSchedule())
+registry.register(ThreeDaysWeather())
 
 wx.AddListenChat(who=target, savepic=False)
 wx.AddListenChat(who='bottest', savepic=False)
