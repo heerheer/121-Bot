@@ -56,8 +56,8 @@ class DailyGoodMorningSchedule(ScheduleCommand):
 
 class CrazyKFCSchedule(ScheduleCommand):
     def __init__(self):
-        # 假设每天早上 12 点执行
-        super().__init__('0 12 * * 4')
+        # 每周四 12 点执行
+        super().__init__('0 12 * * THU')
 
     def match(self, content):
         return content in ['疯狂星期四','kfc','KFC','crazy']
